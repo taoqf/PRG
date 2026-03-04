@@ -143,51 +143,125 @@ This document outlines the planning for a comprehensive GitHub Skills suite that
 - Include async/await patterns with CancellationToken support
 - **Auto-format generated code with dotnet format**
 
-### Skill 8a: `blazor-page-generator` ✅ **Finished - Page-First Development**
-**Responsibility**: Generate complete Blazor page (.razor) files with routing and page structure
-**Input**: Entity metadata JSON + Page type (List/Create/Edit/Detail)
-**Output**: Complete Blazor page files with navigation and layout
+## 🆕 Blazor 分层架构设计 - 支持灵活组件库选型
 
-**Script**: `generate-blazor-pages.ts` (run with bun)
-- Generate page-level .razor files with @page directives
-- Include MudBlazor layout and container structure
-- Add page-specific toolbars and navigation
-- Integrate with component hierarchy
-- Support multi-entity page relationships
-- **Generated 28 complete Blazor pages (4 types × 7 entities)**
+### 第1层：架构基础层
 
-### Skill 8b: `blazor-list-component-generator`
-**Responsibility**: Generate Blazor list/grid components for entities
-**Input**: Entity metadata JSON
-**Output**: Blazor list component files
+#### Skill 8a: `blazor-architecture-generator` 🔄 **Redesigned**
+**Responsibility**: 生成页面架构基础和项目结构配置
+**Input**: 项目配置 + 组件库选择（Syncfusion/Material/AntDesign等）
+**Output**: 基础架构文件和配置
 
-**Script**: `generate-blazor-lists.ts` (run with bun)
-- Generate data grid components
-- Add sorting and filtering features
-- Include pagination support
-- Add action buttons (Edit, Delete, View)
+**Script**: `generate-blazor-architecture.ts` (run with bun)
+- 生成基础页面布局结构（Layout.razor、MainLayout.razor）
+- 配置选定组件库的依赖和引用
+- 创建样式和主题配置文件
+- 生成路由配置和导航结构
+- 设置依赖注入容器配置
 
-### Skill 8c: `blazor-form-component-generator`
-**Responsibility**: Generate Blazor form components for entity editing
-**Input**: Entity metadata JSON + Validation rules
-**Output**: Blazor form component files
+#### Skill 8b: `blazor-data-integration-generator`
+**Responsibility**: 生成数据集成和状态管理层
+**Input**: Entity metadata JSON + Service interfaces
+**Output**: 数据访问层和状态管理组件
 
-**Script**: `generate-blazor-forms.ts` (run with bun)
-- Generate create/edit form components
-- Add form validation
-- Include input components for different data types
-- Add save/cancel functionality
+**Script**: `generate-data-integration.ts` (run with bun)
+- 生成页面级数据服务（PageDataService<TEntity>）
+- 创建状态管理组件（State containers）
+- 添加数据加载和错误处理机制
+- 生成缓存和性能优化代码
 
-### Skill 8d: `blazor-detail-component-generator`
-**Responsibility**: Generate Blazor detail view components
-**Input**: Entity metadata JSON
-**Output**: Blazor detail component files
+### 第2层：页面模式层
 
-**Script**: `generate-blazor-details.ts` (run with bun)
-- Generate read-only detail view components
-- Format display for different data types
-- Add navigation to related entities
-- Include action buttons
+#### Skill 8c: `blazor-page-pattern-generator` 🔄 **Enhanced - Component Library Agnostic**
+**Responsibility**: 生成抽象页面模式和路由结构（与组件库无关）
+**Input**: Entity metadata JSON + Page patterns (List/Form/Detail/Dashboard)
+**Output**: 页面模式接口和抽象结构
+
+**Script**: `generate-page-patterns.ts` (run with bun)
+- 定义页面接口和抽象类（IListPage<T>, IFormPage<T>, IDetailPage<T>）
+- 生成页面生命周期管理
+- 创建页面间导航和参数传递机制
+- 添加权限控制和用户交互模式
+
+#### Skill 8d: `blazor-list-pattern-generator`
+**Responsibility**: 生成列表页面的业务逻辑模式
+**Input**: Entity metadata JSON + 排序、筛选、分页需求
+**Output**: 列表页面业务逻辑和交互模式
+
+**Script**: `generate-list-patterns.ts` (run with bun)
+- 生成列表数据管理逻辑（搜索、排序、筛选）
+- 添加分页和虚拟滚动支持
+- 创建批量操作功能（批量删除、导出等）
+- 生成列表项交互事件处理
+
+#### Skill 8e: `blazor-form-pattern-generator`
+**Responsibility**: 生成表单页面的业务逻辑和验证模式
+**Input**: Entity metadata JSON + Validation rules + 表单布局需求
+**Output**: 表单业务逻辑和验证机制
+
+**Script**: `generate-form-patterns.ts` (run with bun)
+- 生成表单数据绑定和验证逻辑
+- 添加动态表单字段管理
+- 创建表单状态跟踪（脏数据检测、自动保存）
+- 生成复杂表单交互（级联选择、条件显示）
+
+#### Skill 8f: `blazor-detail-pattern-generator`
+**Responsibility**: 生成详情页面的展示逻辑和关联数据处理
+**Input**: Entity metadata JSON + 关联实体信息
+**Output**: 详情页面业务逻辑和关联数据管理
+
+**Script**: `generate-detail-patterns.ts` (run with bun)
+- 生成详情数据展示逻辑
+- 添加关联数据的延迟加载
+- 创建详情页面的操作按钮逻辑
+- 生成审计日志和变更历史显示
+
+### 第3层：组件库适配层
+
+#### Skill 8g: `blazor-component-adapter-base`
+**Responsibility**: 组件适配器基础框架和接口定义
+**Input**: 页面模式接口
+**Output**: 组件适配器基础类和接口
+
+**Script**: `generate-adapter-base.ts` (run with bun)
+- 定义组件适配器接口（IComponentAdapter）
+- 创建适配器基础类（BaseComponentAdapter）
+- 生成组件映射和转换机制
+- 添加主题和样式适配接口
+
+#### Skill 8h: `blazor-syncfusion-adapter` 🎯 **Current Priority**
+**Responsibility**: Syncfusion Blazor 组件库适配器实现
+**Input**: 页面模式 + Syncfusion 组件配置
+**Output**: Syncfusion 具体组件实现
+
+**Script**: `generate-syncfusion-adapter.ts` (run with bun)
+- 实现 Syncfusion 数据网格适配（SfGrid）
+- 生成 Syncfusion 表单组件适配（SfTextBox, SfDropDownList等）
+- 添加 Syncfusion 主题和样式配置
+- 创建 Syncfusion 特有功能集成（图表、日历等）
+
+#### Skill 8i: `blazor-material-adapter` 📋 **Future Extension**
+**Responsibility**: Material Design Blazor 组件库适配器
+**Input**: 页面模式 + Material Design 配置
+**Output**: Material Design 具体组件实现
+
+**Script**: `generate-material-adapter.ts` (run with bun)
+- 为未来扩展 MudBlazor 或其他 Material Design 库做准备
+- 支持 Material Design 设计风格
+- 提供平滑的组件库迁移路径
+
+### 第4层：样式和主题层
+
+#### Skill 8j: `blazor-theme-generator`
+**Responsibility**: 主题、样式和品牌定制化生成
+**Input**: 品牌配置 + 设计系统规范
+**Output**: 主题 CSS、品牌样式和定制化配置
+
+**Script**: `generate-themes.ts` (run with bun)
+- 生成企业品牌主题（颜色、字体、间距）
+- 创建响应式设计配置
+- 添加深色/浅色主题切换支持
+- 生成可访问性（Accessibility）优化样式
 
 ### Skill 7b: `page-driven-service-generator` 🔄 **Redesigned - Based on Page Operations**
 **Responsibility**: Generate service implementation classes based on actual page operations and business requirements
@@ -299,22 +373,50 @@ This document outlines the planning for a comprehensive GitHub Skills suite that
 │       └── scripts/
 │           └── generate-context.ts
 ├── presentation/
-│   ├── blazor-page-generator/
-│   │   ├── SKILL.md
-│   │   └── scripts/
-│   │       └── generate-blazor-pages.ts
-│   ├── blazor-list-component-generator/
-│   │   ├── SKILL.md
-│   │   └── scripts/
-│   │       └── generate-blazor-lists.ts
-│   ├── blazor-form-component-generator/
-│   │   ├── SKILL.md
-│   │   └── scripts/
-│   │       └── generate-blazor-forms.ts
-│   └── blazor-detail-component-generator/
-│       ├── SKILL.md
-│       └── scripts/
-│           └── generate-blazor-details.ts
+│   ├── architecture/
+│   │   ├── blazor-architecture-generator/
+│   │   │   ├── SKILL.md
+│   │   │   └── scripts/
+│   │   │       └── generate-blazor-architecture.ts
+│   │   └── blazor-data-integration-generator/
+│   │       ├── SKILL.md
+│   │       └── scripts/
+│   │           └── generate-data-integration.ts
+│   ├── patterns/
+│   │   ├── blazor-page-pattern-generator/
+│   │   │   ├── SKILL.md
+│   │   │   └── scripts/
+│   │   │       └── generate-page-patterns.ts
+│   │   ├── blazor-list-pattern-generator/
+│   │   │   ├── SKILL.md
+│   │   │   └── scripts/
+│   │   │       └── generate-list-patterns.ts
+│   │   ├── blazor-form-pattern-generator/
+│   │   │   ├── SKILL.md
+│   │   │   └── scripts/
+│   │   │       └── generate-form-patterns.ts
+│   │   └── blazor-detail-pattern-generator/
+│   │       ├── SKILL.md
+│   │       └── scripts/
+│   │           └── generate-detail-patterns.ts
+│   ├── adapters/
+│   │   ├── blazor-component-adapter-base/
+│   │   │   ├── SKILL.md
+│   │   │   └── scripts/
+│   │   │       └── generate-adapter-base.ts
+│   │   ├── blazor-syncfusion-adapter/
+│   │   │   ├── SKILL.md
+│   │   │   └── scripts/
+│   │   │       └── generate-syncfusion-adapter.ts
+│   │   └── blazor-material-adapter/
+│   │       ├── SKILL.md
+│   │       └── scripts/
+│   │           └── generate-material-adapter.ts
+│   └── styling/
+│       └── blazor-theme-generator/
+│           ├── SKILL.md
+│           └── scripts/
+│               └── generate-themes.ts
 ├── business-logic/
 │   └── page-driven-service-generator/
 │       ├── SKILL.md
@@ -467,7 +569,7 @@ bun run scripts/[script-name].ts
 
 ## Workflow Scenarios
 
-### Scenario 1: New Project (Page-First Development)
+### Scenario 1: New Project (分层架构开发)
 0. `project-creator` → Create project structure, configure .csproj files, set up development environment
 1. `workflow-orchestrator` → Analyze project state, recommend complete generation process
 2. `domain-model-parser` → Parse domain models
@@ -479,32 +581,55 @@ bun run scripts/[script-name].ts
 8. `repository-interface-generator` → Generate Repository interfaces
 9. `efcore-repository-generator` → Generate EF Core Repository implementations
 10. `service-interface-generator` → Generate service interfaces (contracts only)
-**[Page-First Development Phase]**
-11. `blazor-page-generator` → Generate complete page structure with routing (NEW)
-12. `blazor-list-component-generator` → Generate list components
-13. `blazor-form-component-generator` → Generate form components
-14. `blazor-detail-component-generator` → Generate detail components
-**[Page-Driven Service Implementation]**
-15. `page-driven-service-generator` → Generate service implementations based on actual page operations (REDESIGNED)
+**[分层架构 UI 开发阶段]**
+11. `blazor-architecture-generator` → Generate project architecture and component library configuration
+12. `blazor-data-integration-generator` → Generate data integration layer and state management
+13. `blazor-page-pattern-generator` → Generate abstract page patterns and routing
+14. `blazor-list-pattern-generator` → Generate list page business logic patterns
+15. `blazor-form-pattern-generator` → Generate form page business logic and validation
+16. `blazor-detail-pattern-generator` → Generate detail page logic and related data handling
+**[组件库适配阶段]**
+17. `blazor-component-adapter-base` → Generate component adapter framework and interfaces
+18. `blazor-syncfusion-adapter` → Generate Syncfusion component implementations (Current)
+19. `blazor-theme-generator` → Generate enterprise themes and styling
+**[业务逻辑集成阶段]**
+20. `page-driven-service-generator` → Generate service implementations based on page operations
 
-### Scenario 2: Domain Model Modification
+### Scenario 2: 组件库迁移（Syncfusion → Material Design）
+1. `workflow-orchestrator` → Detect component library migration requirements
+2. `blazor-architecture-generator` → Update project configuration for new component library
+3. `blazor-material-adapter` → Generate Material Design component implementations
+4. `blazor-theme-generator` → Regenerate themes for new component library
+5. **无需修改业务逻辑层** - 页面模式层保持不变
+6. **无需修改数据层** - 数据集成层保持不变
+
+### Scenario 3: Domain Model Modification
 1. `workflow-orchestrator` → Detect model changes, recommend incremental update process
 2. `model-change-detector` → Analyze specific changes
 3. `incremental-update-generator` → Generate update scripts based on changes
 4. Selectively call affected generators:
-   - Entity changes: `enum-generator` + `entity-class-generator` + `entity-configuration-generator`
-   - New entities: Full generation sequence for new entities only
-   - Relationship changes: `entity-configuration-generator` + `data-context-generator`
-   - Repository changes: `repository-interface-generator` + `efcore-repository-generator`
-   - UI changes: Relevant Blazor component generators
+   - **Entity changes**: `enum-generator` + `entity-class-generator` + `entity-configuration-generator`
+   - **New entities**: 数据层 + 页面模式层 (only abstract patterns, adapters remain)
+   - **Relationship changes**: `entity-configuration-generator` + `data-context-generator` + `blazor-data-integration-generator`
+   - **UI changes**: Only regenerate affected page patterns, adapters auto-adapt
 
-### Scenario 3: Update Specific Layer Only
+### Scenario 4: 新组件库添加（保持多组件库共存）
+1. `workflow-orchestrator` → Based on user intent, recommend adapter-only generation
+2. `blazor-component-adapter-base` → Extend base framework if needed
+3. **新组件库适配器** → Create adapter for new component library (e.g., AntDesign, DevExpress)
+4. `blazor-theme-generator` → Generate themes compatible with new component library
+5. **业务逻辑无变** - 页面模式层和数据层保持不变
+
+### Scenario 5: Update Specific Layer Only
 1. `workflow-orchestrator` → Based on user intent, recommend specific skill combinations
 2. Call relevant specific generators:
    **Entity Layer**: `enum-generator` + `entity-class-generator` + `entity-configuration-generator`
-   **Data Layer**: `repository-interface-generator` + `efcore-repository-generator`
+   **Data Layer**: `repository-interface-generator` + `efcore-repository-generator` + `blazor-data-integration-generator`
    **Business Layer**: `service-interface-generator` + `page-driven-service-generator`
-   **UI Layer**: `blazor-page-generator` + `blazor-list-component-generator` + `blazor-form-component-generator` + `blazor-detail-component-generator`
+   **UI Architecture Layer**: `blazor-architecture-generator` + `blazor-data-integration-generator`
+   **UI Pattern Layer**: `blazor-page-pattern-generator` + `blazor-list-pattern-generator` + `blazor-form-pattern-generator` + `blazor-detail-pattern-generator`
+   **UI Adapter Layer**: 任何特定组件库适配器 (Syncfusion/Material/etc.)
+   **Styling Layer**: `blazor-theme-generator`
    **Database**: `database-migration-generator` + `data-context-generator`
 
 ## Integration Points
@@ -512,8 +637,12 @@ bun run scripts/[script-name].ts
 ### Target Code Locations
 - `src/Sanjel.RequestManagement.Core/` - Entity classes and services
 - `src/Sanjel.RequestManagement.Repositories/` - Repository classes
-- `src/Sanjel.RequestManagement.Blazor/Pages/` - Blazor pages (NEW)
-- `src/Sanjel.RequestManagement.Blazor/Components/` - Blazor components
+- `src/Sanjel.RequestManagement.Blazor/Architecture/` - 架构基础和配置 (NEW)
+- `src/Sanjel.RequestManagement.Blazor/Data/` - 数据集成和状态管理 (NEW)
+- `src/Sanjel.RequestManagement.Blazor/Pages/` - 页面模式和抽象结构 (REDESIGNED)
+- `src/Sanjel.RequestManagement.Blazor/Components/` - 组件库适配器实现 (REDESIGNED)
+- `src/Sanjel.RequestManagement.Blazor/Themes/` - 主题和样式配置 (NEW)
+- `src/Sanjel.RequestManagement.Blazor/Adapters/` - 组件适配器接口 (NEW)
 
 ### Configuration Integration
 - Update `.csproj` file dependencies
@@ -526,14 +655,19 @@ bun run scripts/[script-name].ts
 
 ## Benefits
 
-1. **Consistency**: Ensures all generated code follows the same patterns and standards
-2. **Efficiency**: Reduces manual coding time and potential errors
-3. **Maintainability**: Keeps code synchronized with domain model changes
-4. **Quality**: Enforces best practices and design patterns
-5. **Traceability**: Maintains clear connection between domain models and implementation
-6. **Modularity**: Fine-grained skills allow selective updates and easier debugging
-5. **Flexibility**: Uses modern EF Core implementation with performance optimization
-8. **Scalability**: Individual skills can be enhanced without affecting others
+1. **分层架构灵活性**: 组件库可替换而不影响业务逻辑
+2. **技术栈适配**: 支持 Syncfusion、Material Design、AntDesign 等多种组件库
+3. **渐进式迁移**: 可以逐步迁移组件库而不需要全重写
+4. **Consistency**: Ensures all generated code follows the same patterns and standards
+5. **Efficiency**: Reduces manual coding time and potential errors
+6. **Maintainability**: Keeps code synchronized with domain model changes
+7. **Quality**: Enforces best practices and design patterns
+8. **Traceability**: Maintains clear connection between domain models and implementation
+9. **Modularity**: Fine-grained skills allow selective updates and easier debugging
+10. **Flexibility**: Uses modern EF Core implementation with performance optimization
+11. **Scalability**: Individual skills can be enhanced without affecting others
+12. **企业级扩展性**: 支持多组件库并行使用和动态切换
+13. **开发效率**: 业务逻辑与 UI 的完全分离，并行开发
 
 ## Skill Architecture Benefits
 
@@ -571,9 +705,25 @@ After splitting larger skills into focused components, we achieve:
 **Phase 1 (Foundation)**: Skills 1, 2, 3, 4a, 4b, 5, 9 - Basic enum, entity and database generation ✅ **Complete**
 **Phase 2 (Data Access)**: Skills 6a, 6b - Repository pattern implementation ✅ **Complete (6a Complete, 6b Implemented)**
 **Phase 3 (Service Contracts)**: Skill 7a - Service interface generation ✅ **Complete**
-**Phase 4 (Page-First UI)**: Skills 8a, 8b, 8c, 8d - Page and component generation ✅ **Started (8a Complete)**
-**Phase 5 (Page-Driven Services)**: Skill 7b - Service implementation based on page operations 🔄 **REDESIGNED**
-**Phase 6 (Change Management)**: Skills 10, 11 - Model change detection and updates
+**Phase 4 (分层 UI 架构)**: Skills 8a, 8b - 基础架构和数据集成 🔄 **REDESIGNED**
+**Phase 5 (页面模式)**: Skills 8c, 8d, 8e, 8f - 抽象页面模式生成 🎯 **NEW PRIORITY**
+**Phase 6 (组件适配)**: Skills 8g, 8h - 组件适配器框架和 Syncfusion 实现 🎯 **CURRENT FOCUS**
+**Phase 7 (主题样式)**: Skill 8j - 主题和样式生成 📋 **NEW**
+**Phase 8 (业务集成)**: Skill 7b - Service implementation based on page operations 🔄 **REDESIGNED**
+**Phase 9 (变更管理)**: Skills 10, 11 - Model change detection and updates
+
+## 新架构优势对比
+
+### 📊 旧架构 vs 新架构
+
+| 方面             | 旧架构（直接组件生成）        | 新架构（分层适配）   |
+| ---------------- | ----------------------------- | -------------------- |
+| **组件库绑定**   | ✅ 强绑定 MudBlazor/Syncfusion | ✅ 灵活适配不同组件库 |
+| **迁移成本**     | ❌ 全重写代码                  | ✅ 只更换适配器       |
+| **业务逻辑复用** | ❌ 与 UI 紧耦合                | ✅ 完全分离可复用     |
+| **开发维护**     | ❌ 修改需改多个技能            | ✅ 各层独立维护       |
+| **技术栈选择**   | ❌ 受限于初期选择              | ✅ 支持多技本栈并行   |
+| **企业适配**     | ❌ 难以满足不同团队需求        | ✅ 灵活适应企业标准   |
 
 ## Notes
 
